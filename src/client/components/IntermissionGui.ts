@@ -18,7 +18,7 @@ export class IntermissionGui extends BaseComponent<Attributes, IntermissionGuiIn
 				this.instance.Enabled = false;
 			} else {
 				if (!this.instance.Enabled) this.instance.Enabled = true;
-				this.instance.TextLabel.Text = `Intermission: ${secondsRemaining}`;
+				this.instance.TextLabel.Text = tostring(secondsRemaining);
 			}
 		});
 	}

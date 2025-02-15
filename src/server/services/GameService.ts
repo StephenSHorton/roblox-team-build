@@ -1,10 +1,11 @@
 import { OnStart, Service } from "@flamework/core";
 import { Players } from "@rbxts/services";
 import { Events } from "server/network";
-import { onSetupFinished } from "server/signals";
+import { onGameStarted, onSetupFinished } from "server/signals";
 
 const MIN_PLAYERS = 1;
 const INTERMISSION = 15;
+const GAME_LENGTH = 180;
 
 @Service({})
 export class GameService implements OnStart {
@@ -25,7 +26,7 @@ export class GameService implements OnStart {
 		onSetupFinished.Connect((redTeam, blueTeam) => this.onSetupFinished(redTeam, blueTeam));
 	}
 
-	startGame() {
+	startIntermission() {
 		this.gameIsStarted = true;
 		print("Starting game...");
 
@@ -35,16 +36,21 @@ export class GameService implements OnStart {
 	private onPlayerListChanged() {
 		if (this.gameIsStarted) return;
 		if (this.playerList.size() >= MIN_PLAYERS) {
-			this.startGame();
+			this.startIntermission();
 		}
 	}
 
 	private waitIntermission(seconds: number) {
-		for (let i = seconds; i > 0; i--) {
+		for (let i = seconds; i >= 0; i--) {
 			Events.intermissionTick.broadcast(i);
 			task.wait(1);
 		}
+
+		onGameStarted.Fire();
 	}
 
-	private onSetupFinished(redTeam: Array<Player>, blueTeam: Array<Player>) {}
+	private onSetupFinished(_redTeam: Array<Player>, _blueTeam: Array<Player>) {
+		this.waitIntermission(GAME_LENGTH);
+		this.gameIsStarted = false;
+	}
 }
