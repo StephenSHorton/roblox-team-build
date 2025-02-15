@@ -2,7 +2,9 @@ import { Networking } from "@flamework/networking";
 
 interface ClientToServerEvents {}
 
-interface ServerToClientEvents {}
+interface ServerToClientEvents {
+	intermissionTick: (secondsRemaining: number) => void;
+}
 
 interface ClientToServerFunctions {}
 
